@@ -1,0 +1,3 @@
+package chairbuilder
+
+class InsufficientPartsException extends RuntimeException
