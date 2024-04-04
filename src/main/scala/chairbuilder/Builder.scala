@@ -2,6 +2,6 @@ package chairbuilder
 
 import partbuilder.Part
 
-trait Builder {
-  def buildChair(legA:Part, legB:Part, legC:Part, legD:Part, seat:Part, back:Part):Chair
+abstract class Builder[L<:Part, S<:Part, B<:Part] {
+  def buildChair(legs:L, seat:S, back:B):Chair
 }

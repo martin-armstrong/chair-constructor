@@ -8,34 +8,43 @@ class WorkshopSpec extends AnyWordSpec with Matchers {
 
   "Workshop" should {
     "build a chair" in {
-      val leg = Workshop.getPartBuilder.buildPart("leg", "wood", "", "")
-      val seat = Workshop.getPartBuilder.buildPart("seat", "plastic", "round", "")
-      val back = Workshop.getPartBuilder.buildPart("back", "plastic", "oval", "blue")
+      val legs = Workshop.getLegBuilder.build("wood", "", "")
+      val seat = Workshop.getSeatBuilder.build("plastic", "oval", "")
+      val back = Workshop.getBackBuilder.build("plastic", "round", "blue")
 
-      val chair:Chair = Workshop.getChairBuilder.buildChair(leg, leg, leg, leg, seat, back)
-      chair.description shouldBe "legs:wood seat:plastic,round back:plastic,oval,blue"
+      val chair:Chair = Workshop.getChairBuilder.buildChair(legs, seat, back)
+      chair.description shouldBe "legs:wood seat:plastic,oval back:plastic,round,blue"
     }
 
-    "fail to build a chair with metal seat" in {
-      val leg = Workshop.getPartBuilder.buildPart("leg", "wood", "", "")
-      val seat = Workshop.getPartBuilder.buildPart("seat", "metal", "round", "")
-      val back = Workshop.getPartBuilder.buildPart("back", "plastic", "oval", "blue")
-
+    "fail to build a leg with invalid material" in {
       try {
-        Workshop.getChairBuilder.buildChair(leg, leg, leg, leg, seat, back)
-        fail("should fail with InsufficientParts exception describing the error")
+        val legs = Workshop.getLegBuilder.build("jelly", "", "")
+        fail("should fail with InvalidArgumentException exception with message 'No Material for name: jelly'")
       } catch {
-        case ex:InsufficientPartsException => ex.getMessage shouldBe "seat not made of wood"
+        case ex:IllegalArgumentException => ex.getMessage shouldBe "No Material for name: jelly"
       }
     }
 
-    "fail to build a chair with a pink back" in {
-      val leg = Workshop.getPartBuilder.buildPart("leg", "wood", "", "")
-      val seat = Workshop.getPartBuilder.buildPart("seat", "plastic", "round", "")
-      val back = Workshop.getPartBuilder.buildPart("back", "plastic", "oval", "pink")
+    "fail to build a chair with incorrect seat material" in {
+      val legs = Workshop.getLegBuilder.build("wood", "", "")
+      val seat = Workshop.getSeatBuilder.build("metal", "oval", "")
+      val back = Workshop.getBackBuilder.build("plastic", "round", "blue")
 
       try {
-        Workshop.getChairBuilder.buildChair(leg, leg, leg, leg, seat, back)
+        Workshop.getChairBuilder.buildChair(legs, seat, back)
+        fail("should fail with InsufficientParts exception with message 'seat is not plastic'")
+      } catch {
+        case ex:InsufficientPartsException => ex.getMessage shouldBe "seat is not plastic"
+      }
+    }
+
+    "fail to build a chair with incorrect back colour" in {
+      val legs = Workshop.getLegBuilder.build("wood", "", "")
+      val seat = Workshop.getSeatBuilder.build("plastic", "oval", "")
+      val back = Workshop.getBackBuilder.build("plastic", "round", "pink")
+
+      try {
+        Workshop.getChairBuilder.buildChair(legs, seat, back)
         fail("should fail with InsufficientParts exception describing the error")
       } catch {
         case ex:InsufficientPartsException => ex.getMessage shouldBe "back is not blue"

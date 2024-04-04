@@ -1,5 +1,5 @@
 package partbuilder
 
-trait Builder {
-  def buildPart(name:String,material:String, shape:String, colour:String): Part
+abstract class Builder[P <: Part] {
+  def build(material:String, shape:String, colour:String): P
 }

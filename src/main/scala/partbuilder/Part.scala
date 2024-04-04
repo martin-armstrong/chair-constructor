@@ -1,5 +1,3 @@
 package partbuilder
 
-trait Part {
-  val name:String
-}
+trait Part
